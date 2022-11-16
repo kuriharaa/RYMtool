@@ -1,10 +1,10 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RYMtool.API", "RYMtool.API\RYMtoolTool.API.csproj", "{F59F8E4D-8929-468A-9E58-A7F50223F36B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RYMtool.API", "RYMtool.API\RYMtool.API.csproj", "{F59F8E4D-8929-468A-9E58-A7F50223F36B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RYMtool.Infrastructure", "RYMtoolTool.Infrastructure\RYMtool.Infrastructure.csproj", "{55597066-1830-43BF-B682-613B10D18966}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RYMtool.Infrastructure", "RYMtool.Infrastructure\RYMtool.Infrastructure.csproj", "{55597066-1830-43BF-B682-613B10D18966}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RYMtool.Core", "RYMtoolTool.Core\RYMtool.Core.csproj", "{A8D7EDBC-6D44-442A-A404-F9511BDD2699}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RYMtool.Core", "RYMtool.Core\RYMtool.Core.csproj", "{A8D7EDBC-6D44-442A-A404-F9511BDD2699}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
