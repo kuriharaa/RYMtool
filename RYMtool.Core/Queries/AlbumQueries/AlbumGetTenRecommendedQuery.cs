@@ -18,7 +18,7 @@ public class AlbumGetTenRecommendedQuery:Query<Album>,IListResultQuery
         return dbSet
             .Include(x => x.Ratings)
             .Include(x => x.Reviews)
-            .Where(x => x.Reviews.Count>10)
+            .Where(x => x.Reviews.Count>=1)
             .Where(x => string.IsNullOrEmpty(_genre)==true || x.Genre.ToLower()==_genre.ToLower())
             .OrderByDescending(x => x.Ratings!.Sum(r => r.Score))
             .Take(10);

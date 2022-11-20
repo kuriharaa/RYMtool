@@ -4,7 +4,7 @@ using RYMtool.Core.Models;
 
 namespace RYMtool.Infrastructure.Configurations;
 
-public class AlbumConfiguration:IEntityTypeConfiguration<Album>
+public class AlbumConfiguration : IEntityTypeConfiguration<Album>
 {
     public void Configure(EntityTypeBuilder<Album> builder)
     {

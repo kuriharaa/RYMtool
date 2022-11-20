@@ -16,7 +16,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services
     .AddControllers()
     .AddFluentValidation(fv => fv.RegisterValidatorsFromAssembly(Assembly.GetAssembly(typeof(DependencyInjection))));
-builder.Services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("Albums"));
+//builder.Services.AddDbContext<DataContext>(opt => opt.UseInMemoryDatabase("RYMdb"));
+string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<DataContext>(opt => opt.UseSqlServer(connectionString));
 builder.Services.AddHttpLogging(opt => 
     opt.LoggingFields = HttpLoggingFields.RequestMethod | 
                         HttpLoggingFields.RequestHeaders | 
@@ -24,7 +26,7 @@ builder.Services.AddHttpLogging(opt =>
                         HttpLoggingFields.RequestBody|
                         HttpLoggingFields.ResponseBody);
 builder.Services
-    .AddApplication()
+    .AddCore()
     .AddInfrastructure();
 builder.Services.Configure<AppSettings>(builder.Configuration.GetSection("AppSettings"));
 builder.Services.AddTransient(ser => ser.GetRequiredService<IOptions<AppSettings>>().Value);

@@ -8,7 +8,7 @@ namespace RYMtool.Core;
 
 public static class DependencyInjection
 {
-    public static IServiceCollection AddApplication(this IServiceCollection service)
+    public static IServiceCollection AddCore(this IServiceCollection service)
     {
         return service
             .AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies())

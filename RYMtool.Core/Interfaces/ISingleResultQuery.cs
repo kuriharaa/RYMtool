@@ -1,4 +1,4 @@
-﻿namespace RYMtool.Application.Interfaces;
+﻿namespace RYMtool.Core.Interfaces;
 
 public interface ISingleResultQuery
 {

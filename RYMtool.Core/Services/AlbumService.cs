@@ -15,7 +15,7 @@ public class AlbumService:IAlbumService
         _repository = repository;
     }
 
-    public async Task<List<Album>> GetAllAlbumsAsync(string? order)
+    public async Task<List<Album>> GetAllAlbumsAsync(string order)
     {
         return await _repository.ListAsync(new AlbumGetAllOrderedQuery(order));
     }
@@ -25,7 +25,7 @@ public class AlbumService:IAlbumService
         return await _repository.AddAsync(album);
     }
 
-    public async Task<List<Album>> GetTenRecommendedAlbumsAsync(string? genre)
+    public async Task<List<Album>> GetTenRecommendedAlbumsAsync(string genre)
     {
         return await _repository.ListAsync(new AlbumGetTenRecommendedQuery(genre));
     }
