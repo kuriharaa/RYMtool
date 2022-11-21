@@ -25,27 +25,41 @@ public class AlbumController : ControllerBase
     [HttpGet("/albums")]
     public async Task<IActionResult> GetAlbums([FromQuery] string order)
     {
-        return Ok(await _albumService.GetAllAlbumsAsync(order));
+        var response = await _albumService.GetAllAlbumsAsync(order);
+
+        if (response.Code == HttpStatusCode.BadRequest) 
+        {
+            return BadRequest(response.Text);
+        }
+
+        return Ok(response.Albums);
     } 
 
     [HttpGet("/recommended")]
     public async Task<IActionResult> GetTenRecommendedAlbums([FromQuery] string genre)
     {
-        return Ok(await _albumService.GetTenRecommendedAlbumsAsync(genre));
+        var response = await _albumService.GetTenRecommendedAlbumsAsync(genre);
+
+        if (response.Code == HttpStatusCode.BadRequest)
+        {
+            return BadRequest(response.Text);
+        }
+
+        return Ok(response.Albums);
     }  
 
     [HttpGet("/albums/{id}")]
     public async Task<IActionResult> GetAlbumDetail([FromRoute] int id)
     {
-        var album = await _albumService.GetAlbumDetailAsync(id);
+        var response = await _albumService.GetAlbumDetailAsync(id);
 
-        if (album == null) 
+        if (response.Code == HttpStatusCode.NotFound) 
         {
-            _logger.LogWarning("album not found | id = {id}", id);
-            return NotFound();
+            _logger.LogWarning(string.Concat(response.Text, ("id = {id}", id)));
+            return NotFound(response.Text);
         }
 
-        return Ok(album);
+        return Ok(response.Album);
     }
 
     [HttpDelete("/albums/{id}/")]

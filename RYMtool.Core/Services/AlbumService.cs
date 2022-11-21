@@ -6,6 +6,7 @@ using RYMtool.Core.Queries.AlbumQueries;
 using AutoMapper;
 using System.Net;
 using Microsoft.Extensions.Logging;
+using RYMtool.Core.Dtos.Responses;
 
 namespace RYMtool.Core.Services;
 
@@ -20,12 +21,17 @@ public class AlbumService : IAlbumService
         _mapper = mapper;
     }
 
-    public async Task<List<AlbumDto>> GetAllAlbumsAsync(string order)
+    public async Task<ResponseAlbums> GetAllAlbumsAsync(string order)
     {
+        if (string.IsNullOrWhiteSpace(order))
+        {
+            return new ResponseAlbums() { Code = HttpStatusCode.BadRequest, Text = "incorrect order", Albums = null };
+        }
+
         var albums = await _repository.ListAsync(new AlbumGetAllOrderedQuery(order));
         var result = _mapper.Map<List<AlbumDto>>(albums);
 
-        return result;
+        return new ResponseAlbums() { Code = HttpStatusCode.OK, Albums = result };
     }
 
     public async Task<Album> AddAsync(AlbumCreateDto albumDto)
@@ -34,25 +40,30 @@ public class AlbumService : IAlbumService
         return await _repository.AddAsync(album);
     }
 
-    public async Task<List<AlbumDto>> GetTenRecommendedAlbumsAsync(string genre)
+    public async Task<ResponseAlbums> GetTenRecommendedAlbumsAsync(string genre)
     {
+        if (string.IsNullOrWhiteSpace(genre))
+        {
+            return new ResponseAlbums() { Code = HttpStatusCode.BadRequest, Text = "incorrect genre", Albums = null };
+        }
+
         var albums = await _repository.ListAsync(new AlbumGetTenRecommendedQuery(genre));
         var result = _mapper.Map<List<AlbumDto>>(albums);
 
-        return result;
+        return new ResponseAlbums() { Code = HttpStatusCode.OK, Albums = result };
     }
 
-    public async Task<AlbumListReviewDto?> GetAlbumDetailAsync(int id)
+    public async Task<ResponseAlbum> GetAlbumDetailAsync(int id)
     {
         var album = await _repository.GetByQueryAsync(new AlbumListReviewGetByIdQuery(id));
 
         if (album == null) 
         {
-            return null;
+            return new ResponseAlbum() { Code = HttpStatusCode.NotFound, Text = "album not found", Album = null};
         }
 
         var result = _mapper.Map<AlbumListReviewDto>(album);
-        return result;
+        return new ResponseAlbum() { Code = HttpStatusCode.OK, Album = result };
     }
 
     public async Task<HttpStatusCode> DeleteAlbumAsync(int id)

@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
+using RYMtool.Core.Dtos.Responses;
 using RYMtool.Core.Models;
 
 namespace RYMtool.Core.Dtos;
 
-public class AlbumListReviewDto:IMap
+public class AlbumListReviewDto : Response, IMap
 {
     public record AlbumReview(int Id, string Message, string Reviewer);
     public int Id { get; set; }
