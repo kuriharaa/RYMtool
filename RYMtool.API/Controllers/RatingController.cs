@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using RYMtool.Core.Dtos;
 using RYMtool.Core.Models;
 using RYMtool.Core.Services;
@@ -10,23 +9,25 @@ namespace RYMtool.API.Controllers;
 [Route("api")]
 public class RatingController:ControllerBase
 {
-    private readonly IRatingService _reviewService;
-    private readonly IMapper _mapper;
+    private readonly IRatingService _ratingService;
+    private readonly ILogger _logger;
 
-    public RatingController(
-        IRatingService reviewService, 
-        IMapper mapper)
+    public RatingController(IRatingService ratingService, ILogger<RatingController> logger)
     {
-        _reviewService = reviewService;
-        _mapper = mapper;
+        _ratingService = ratingService;
+        _logger = logger;
     }
 
     [HttpPost("albums/{id}/rating")]
-    public async Task<IActionResult> SaveRating(RatingDto reviewDto,int id)
+    public async Task<IActionResult> SaveRating([FromBody] RatingDto ratingDto, [FromRoute] int id)
     {
-        var review = _mapper.Map<Rating>(reviewDto);
-        review.AlbumId = id;
-        var res = await _reviewService.SaveRatingAsync(review);
-        return Ok(new {res.Id});
+        var result = await _ratingService.SaveRatingAsync(ratingDto, id);
+        if (result == null) 
+        {
+            _logger.LogWarning("album not found | id = {id}", id);
+            return NotFound();
+        }
+
+        return Ok( new { result.Id });
     }
 }

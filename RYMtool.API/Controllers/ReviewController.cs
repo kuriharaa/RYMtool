@@ -10,22 +10,24 @@ namespace RYMtool.API.Controllers;
 public class ReviewController:ControllerBase
 {
     private readonly IReviewService _reviewService;
-    private readonly IMapper _mapper;
+    private readonly ILogger _logger;
 
-    public ReviewController(
-        IReviewService reviewService, 
-        IMapper mapper)
+    public ReviewController(IReviewService reviewService, ILogger<ReviewController> logger)
     {
         _reviewService = reviewService;
-        _mapper = mapper;
+        _logger = logger;
     }
 
     [HttpPost("albums/{id}/review")]
-    public async Task<IActionResult> SaveReview(ReviewDto reviewDto,int id)
+    public async Task<IActionResult> SaveReview([FromBody] ReviewDto reviewDto, [FromRoute] int id)
     {
-        var review = _mapper.Map<Review>(reviewDto);
-        review.AlbumId = id;
-        var res = await _reviewService.SaveReviewAsync(review);
-        return Ok(new {res.Id});
+        var result = await _reviewService.SaveReviewAsync(reviewDto, id);
+        if (result == null)
+        {
+            _logger.LogWarning("album not found | id = {id}", id);
+            return NotFound();
+        }
+
+        return Ok( new { result.Id } );
     }
 }

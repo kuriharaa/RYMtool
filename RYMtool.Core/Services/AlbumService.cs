@@ -3,46 +3,68 @@ using RYMtool.Core.Exceptions;
 using RYMtool.Core.Interfaces;
 using RYMtool.Core.Models;
 using RYMtool.Core.Queries.AlbumQueries;
+using AutoMapper;
+using System.Net;
+using Microsoft.Extensions.Logging;
 
 namespace RYMtool.Core.Services;
 
-public class AlbumService:IAlbumService
+public class AlbumService : IAlbumService
 {
     private readonly IRepository<Album> _repository;
+    private readonly IMapper _mapper;
 
-    public AlbumService(IRepository<Album> repository)
+    public AlbumService(IRepository<Album> repository, IMapper mapper)
     {
         _repository = repository;
+        _mapper = mapper;
     }
 
-    public async Task<List<Album>> GetAllAlbumsAsync(string order)
+    public async Task<List<AlbumDto>> GetAllAlbumsAsync(string order)
     {
-        return await _repository.ListAsync(new AlbumGetAllOrderedQuery(order));
+        var albums = await _repository.ListAsync(new AlbumGetAllOrderedQuery(order));
+        var result = _mapper.Map<List<AlbumDto>>(albums);
+
+        return result;
     }
 
-    public async Task<Album> AddAsync(Album album)
+    public async Task<Album> AddAsync(AlbumCreateDto albumDto)
     {
+        var album = _mapper.Map<Album>(albumDto);
         return await _repository.AddAsync(album);
     }
 
-    public async Task<List<Album>> GetTenRecommendedAlbumsAsync(string genre)
+    public async Task<List<AlbumDto>> GetTenRecommendedAlbumsAsync(string genre)
     {
-        return await _repository.ListAsync(new AlbumGetTenRecommendedQuery(genre));
+        var albums = await _repository.ListAsync(new AlbumGetTenRecommendedQuery(genre));
+        var result = _mapper.Map<List<AlbumDto>>(albums);
+
+        return result;
     }
 
-    public async Task<Album> GetAlbumDetailAsync(int id)
+    public async Task<AlbumListReviewDto?> GetAlbumDetailAsync(int id)
     {
         var album = await _repository.GetByQueryAsync(new AlbumListReviewGetByIdQuery(id));
-        if (album == null)
-            throw new NotFoundException(nameof(Album),id);
-        return album;
+
+        if (album == null) 
+        {
+            return null;
+        }
+
+        var result = _mapper.Map<AlbumListReviewDto>(album);
+        return result;
     }
 
-    public async Task DeleteAlbumAsync(int id)
+    public async Task<HttpStatusCode> DeleteAlbumAsync(int id)
     {
         var album = await _repository.GetByIdAsync(id);
+
         if (album == null)
-            throw new NotFoundException(nameof(album), id);
+        {
+            return HttpStatusCode.NotFound;
+        }
+         
         await _repository.DeleteAsync(album);
+        return HttpStatusCode.OK;
     }
 }

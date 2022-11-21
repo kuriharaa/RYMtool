@@ -1,12 +1,14 @@
-﻿using RYMtool.Core.Models;
+﻿using RYMtool.Core.Dtos;
+using RYMtool.Core.Models;
+using System.Net;
 
 namespace RYMtool.Core.Services;
 
 public interface IAlbumService:IService
 {
-    Task<List<Album>> GetAllAlbumsAsync(string? order);
-    Task<Album> AddAsync(Album album);
-    Task<List<Album>> GetTenRecommendedAlbumsAsync(string? genre);
-    Task<Album> GetAlbumDetailAsync(int id);
-    Task DeleteAlbumAsync(int id);
+    Task<List<AlbumDto>> GetAllAlbumsAsync(string? order);
+    Task<Album> AddAsync(AlbumCreateDto album);
+    Task<List<AlbumDto>> GetTenRecommendedAlbumsAsync(string? genre);
+    Task<AlbumListReviewDto?> GetAlbumDetailAsync(int id);
+    Task<HttpStatusCode> DeleteAlbumAsync(int id);
 }

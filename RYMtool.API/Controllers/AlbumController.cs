@@ -1,9 +1,9 @@
-using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using RYMtool.Core.Dtos;
 using RYMtool.Core.Exceptions;
 using RYMtool.Core.Models;
 using RYMtool.Core.Services;
+using System.Net;
 
 namespace RYMtool.API.Controllers;
 
@@ -12,41 +12,40 @@ namespace RYMtool.API.Controllers;
 public class AlbumController : ControllerBase
 {
     private readonly IAlbumService _albumService;
-    private readonly IMapper _mapper;
     private readonly AppSettings _appSettings;
+    private readonly ILogger _logger;
 
-    public AlbumController(
-        IAlbumService albumService, 
-        IMapper mapper, 
-        AppSettings appSettings)
+    public AlbumController(IAlbumService albumService, AppSettings appSettings, ILogger<AlbumController> logger)
     {
         _albumService = albumService;
-        _mapper = mapper;
         _appSettings = appSettings;
+        _logger = logger;
     }
 
     [HttpGet("/albums")]
     public async Task<IActionResult> GetAlbums([FromQuery] string order)
     {
-        var albums = await _albumService.GetAllAlbumsAsync(order);
-        var result = _mapper.Map<List<AlbumDto>>(albums);
-        return Ok(result);
+        return Ok(await _albumService.GetAllAlbumsAsync(order));
     } 
 
     [HttpGet("/recommended")]
     public async Task<IActionResult> GetTenRecommendedAlbums([FromQuery] string genre)
     {
-        var albums = await _albumService.GetTenRecommendedAlbumsAsync(genre);
-        var result = _mapper.Map<List<AlbumDto>>(albums);
-        return Ok(result);
+        return Ok(await _albumService.GetTenRecommendedAlbumsAsync(genre));
     }  
 
     [HttpGet("/albums/{id}")]
     public async Task<IActionResult> GetAlbumDetail([FromRoute] int id)
     {
         var album = await _albumService.GetAlbumDetailAsync(id);
-        var result = _mapper.Map<AlbumListReviewDto>(album);
-        return Ok(result);
+
+        if (album == null) 
+        {
+            _logger.LogWarning("album not found | id = {id}", id);
+            return NotFound();
+        }
+
+        return Ok(album);
     }
 
     [HttpDelete("/albums/{id}/")]
@@ -54,18 +53,25 @@ public class AlbumController : ControllerBase
     {
         if (secret != _appSettings.SecretKey) 
         {
+            _logger.LogWarning("invalid key | key = {secret}", secret);
             return BadRequest();
         }
 
-        await _albumService.DeleteAlbumAsync(id);
+        var statusCode = await _albumService.DeleteAlbumAsync(id);
+        if (statusCode == HttpStatusCode.NotFound) 
+        {
+            _logger.LogWarning("album not found | id = {id}", id);
+            return NotFound();
+        }
+
+        _logger.LogInformation("album was deleted... | id = {id}", id);
         return Ok();
     } 
    
     [HttpPost("/albums/save")]
-    public async Task<IActionResult> SaveAlbum(AlbumCreateDto albumDto)
+    public async Task<IActionResult> SaveAlbum([FromBody] AlbumCreateDto albumDto)
     {
-        var album = _mapper.Map<Album>(albumDto);
-        var result = await _albumService.AddAsync(album);
+        var result = await _albumService.AddAsync(albumDto);
         return Ok(new { result.Id });
     }
 }
